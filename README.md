@@ -44,7 +44,6 @@ module "automq-byoc" {
   # Set the identifier for the environment to be installed.
   automq_byoc_env_id                       = "example" 
 
-  # Set the target regionId of gcp
   cloud_provider_region                    = "asia-southeast1"  
   cloud_provider_zone                      = "asia-southeast1-a"
   cloud_project_id                         = "xxxxxxxx"
@@ -83,23 +82,23 @@ To install the AutoMQ BYOC environment using an existing VPC, ensure your existi
 ```terraform
 module "automq-byoc" {
   source = "AutoMQ/automq-byoc-environment/google"
-  
-  # Set the identifier for the environment to be installed.  
-  automq_byoc_env_id                       = "example"
 
-  # Set the target regionId of gcp    
+  # Set the identifier for the environment to be installed.
+  automq_byoc_env_id                       = "example" 
+
+  # Set the target regionId of gcp
   cloud_provider_region                    = "asia-southeast1"  
   cloud_provider_zone                      = "asia-southeast1-a"
-  cloud_project_id                         = "xxxxxxxx"
+  cloud_project_id                         = "xxxxx"
 
-  # Set this switch to false, use existed vpc  
   create_new_vpc                           = false   
+  existing_vpc_name                        = "xxxxx-network"
+  existing_subnet_name                     = "xxxxx-subnetwork"
 
-  # Set this existed vpc
-  automq_byoc_vpc_id                       = "vpc-022xxxx54103b"  
-
-  # Set the subnet for deploying the AutoMQ environment console. This subnet must support internet access, and instances created within this subnet must be able to access the internet.
-  automq_byoc_env_console_public_subnet_id = "subnet-09500xxxxxb6fd28"  
+  automq_byoc_data_bucket_name             = "bucker-data-xxxx"
+  automq_byoc_ops_bucket_name              = "bucker-ops-xxxx"
+  automq_byoc_machine_type                 = "e2-standard-2"
+  automq_byoc_default_deploy_type          = "k8s"
 }
 
 # Necessary outputs

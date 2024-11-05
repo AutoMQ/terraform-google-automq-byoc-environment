@@ -84,7 +84,7 @@ resource "google_service_account" "automq_byoc_sa" {
 
 resource "google_project_iam_custom_role" "automq_byoc_role" {
   role_id     = replace("automq_byoc_sa_role_${var.automq_byoc_env_id}", "-", "_")
-  title       = "AutoMQ BYOC Service Account Role"
+  title       = "AutoMQ BYOC ${var.automq_byoc_env_id} SA"
   description = "AutoMQ BYOC Service Account Role"
   permissions = [
     "storage.objects.create",

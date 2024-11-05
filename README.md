@@ -73,6 +73,10 @@ output "automq_byoc_vpc_id" {
 output "automq_byoc_instance_id" {
   value = module.automq-byoc.automq_byoc_instance_id
 }
+
+output "automq_byoc_google_service_account" {
+  value = module.automq-byoc.automq_byoc_google_service_account
+}
 ```
 
 ### Using an existing VPC
@@ -124,6 +128,10 @@ output "automq_byoc_vpc_id" {
 
 output "automq_byoc_instance_id" {
   value = module.automq-byoc.automq_byoc_instance_id
+}
+
+output "automq_byoc_google_service_account" {
+  value = module.automq-byoc.automq_byoc_google_service_account
 }
 ```
 
@@ -249,4 +257,5 @@ output "automq_byoc_instance_id" {
 | <a name="output_automq_byoc_initial_password"></a> [automq_byoc_initial_password](#output_automq_byoc_initial_password) | The initial password for the AutoMQ environment console. This account is used to log in to the environment, create ServiceAccounts, and manage other resources. For detailed information about environment members, please refer to the [documentation](https://docs.automq.com/automq-cloud/manage-identities-and-access/member-accounts). |
 | <a name="output_automq_byoc_vpc_id"></a> [automq_byoc_vpc_id](#output_automq_byoc_vpc_id) | The VPC ID for the AutoMQ environment deployment. |
 | <a name="output_automq_byoc_instance_id"></a> [automq_byoc_instance_id](#output_automq_byoc_instance_id) | The EC2 instance id for AutoMQ Console. |
+| <a name="output_automq_byoc_google_service_account"></a> [automq_byoc_google_service_account](#output_automq_byoc_google_service_account) | The Google Service Account for the AutoMQ environment deployment. |
 <!-- END_TF_DOCS -->

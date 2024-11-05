@@ -27,3 +27,8 @@ output "automq_byoc_instance_id" {
   description = "The EC2 instance id for AutoMQ Console."
   value = google_compute_instance.automq_byoc_console.instance_id
 }
+
+output "automq_byoc_google_service_account" {
+  description = "The Google Service Account for the AutoMQ environment deployment."
+  value = google_service_account.automq_byoc_sa.email
+}

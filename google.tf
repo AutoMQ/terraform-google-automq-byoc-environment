@@ -8,14 +8,97 @@ locals {
   automq_byoc_env_console_public_subnet_name = var.create_new_vpc ? module.automq_byoc_vpc[0].subnets_names[0] : var.existing_subnet_name
   automq_data_bucket                         = var.automq_byoc_data_bucket_name == "" ? google_storage_bucket.automq_byoc_data_bucket[0].name : var.automq_byoc_data_bucket_name
   automq_ops_bucket                          = var.automq_byoc_ops_bucket_name == "" ? google_storage_bucket.automq_byoc_ops_bucket[0].name : var.automq_byoc_ops_bucket_name
+
+  automq_env_tag_key   = "automqEnvironmentId"
+  automq_env_tag_value = var.automq_byoc_env_id
+}
+
+data "google_project" "project" {
+  project_id = var.cloud_project_id
+}
+
+
+locals {
+  automq_vendor_tag_key     = "automqVendor"
+  existing_vendor_keys      = [for key in data.google_tags_tag_keys.existing_vendor_keys.keys : key if key.short_name == local.automq_vendor_tag_key]
+  need_create_vendor_tagKet = length(local.existing_vendor_keys) == 0
+  vendor_tag_key_id         = local.need_create_vendor_tagKet ? "tagKeys/${google_tags_tag_key.automqVendorKey[0].name}" : local.existing_vendor_keys[0].name
+}
+data "google_tags_tag_keys" "existing_vendor_keys" {
+  parent = "projects/${var.cloud_project_id}"
+}
+# Create the tag key if it does not exist
+resource "google_tags_tag_key" "automqVendorKey" {
+  count      = local.need_create_vendor_tagKet ? 1 : 0
+  parent     = "projects/${var.cloud_project_id}"
+  short_name = local.automq_vendor_tag_key
+}
+
+locals {
+  automq_vendor_tag_value     = "automq"
+  existing_vendor_values      = [for value in data.google_tags_tag_values.existing_vendor_values.values : value if value.short_name == local.automq_vendor_tag_value]
+  need_create_vendor_tagValue = length(local.existing_vendor_values) == 0
+  vendor_tag_value_id         = local.need_create_vendor_tagValue ? "tagValues/${google_tags_tag_value.automqVendorValue[0].name}" : local.existing_vendor_values[0].name
+}
+data "google_tags_tag_values" "existing_vendor_values" {
+  parent = local.vendor_tag_key_id
+}
+# Create the tag value if it does not exist
+resource "google_tags_tag_value" "automqVendorValue" {
+  count      = local.need_create_vendor_tagKet ? 1 : 0
+  parent     = local.vendor_tag_key_id
+  short_name = local.automq_vendor_tag_value
+}
+
+
+locals {
+  automq_assigned_tag_key     = "automqAssigned"
+  existing_assigned_keys      = [for key in data.google_tags_tag_keys.existing_assigned_keys.keys : key if key.short_name == local.automq_assigned_tag_key]
+  need_create_assigned_tagKet = length(local.existing_assigned_keys) == 0
+  assigned_tag_key_id         = local.need_create_assigned_tagKet ? "tagKeys/${google_tags_tag_key.automqAssignedKey[0].name}" : local.existing_assigned_keys[0].name
+}
+data "google_tags_tag_keys" "existing_assigned_keys" {
+  parent = "projects/${var.cloud_project_id}"
+}
+resource "google_tags_tag_key" "automqAssignedKey" {
+  count      = local.need_create_assigned_tagKet ? 1 : 0
+  parent     = "projects/${var.cloud_project_id}"
+  short_name = local.automq_assigned_tag_key
+}
+
+locals {
+  automq_assigned_tag_value = "automq"
+  existing_assigned_values  = [for value in data.google_tags_tag_values.existing_assigned_values.values : value if value.short_name == local.automq_assigned_tag_value]
+  need_create_tagValue      = length(local.existing_assigned_values) == 0
+  assigned_tag_value_id     = local.need_create_tagValue ? "tagValues/${google_tags_tag_value.automqAssignedValue[0].name}" : local.existing_assigned_values[0].name
+}
+data "google_tags_tag_values" "existing_assigned_values" {
+  parent = local.assigned_tag_key_id
+}
+# Create the tag value if it does not exist
+resource "google_tags_tag_value" "automqAssignedValue" {
+  count      = local.need_create_assigned_tagKet ? 1 : 0
+  parent     = local.assigned_tag_key_id
+  short_name = local.automq_assigned_tag_value
+}
+
+
+resource "google_tags_tag_key" "automqEnvKey" {
+  parent     = "projects/${var.cloud_project_id}"
+  short_name = local.automq_env_tag_key
+}
+
+resource "google_tags_tag_value" "automqEnvValue" {
+  parent     = "tagKeys/${google_tags_tag_key.automqEnvKey.name}"
+  short_name = local.automq_env_tag_value
 }
 
 # Create object storage bucket if not provided
 resource "google_storage_bucket" "automq_byoc_data_bucket" {
   count = var.automq_byoc_data_bucket_name == "" ? 1 : 0
 
-  name       = "automq-data-${var.automq_byoc_env_id}"
-  location   = var.cloud_provider_region
+  name          = "automq-data-${var.automq_byoc_env_id}"
+  location      = var.cloud_provider_region
   force_destroy = true
 
   uniform_bucket_level_access = true
@@ -33,8 +116,8 @@ resource "google_storage_bucket" "automq_byoc_data_bucket" {
 resource "google_storage_bucket" "automq_byoc_ops_bucket" {
   count = var.automq_byoc_data_bucket_name == "" ? 1 : 0
 
-  name       = "automq-ops-${var.automq_byoc_env_id}"
-  location   = var.cloud_provider_region
+  name          = "automq-ops-${var.automq_byoc_env_id}"
+  location      = var.cloud_provider_region
   force_destroy = true
 
   uniform_bucket_level_access = true
@@ -99,14 +182,14 @@ module "automq_byoc_vpc" {
 # Service Account
 resource "google_service_account" "automq_byoc_sa" {
   account_id   = "automq-byoc-sa-${var.automq_byoc_env_id}"
-  display_name = "AutoMQ BYOC Service Account"
+  display_name = "AutoMQ BYOC ${var.automq_byoc_env_id} Service Account"
   project      = var.cloud_project_id
 }
 
 resource "google_project_iam_custom_role" "automq_byoc_role" {
   role_id     = replace("automq_byoc_sa_role_${var.automq_byoc_env_id}", "-", "_")
   title       = "AutoMQ BYOC ${var.automq_byoc_env_id} SA"
-  description = "AutoMQ BYOC Service Account Role"
+  description = "AutoMQ BYOC ${var.automq_byoc_env_id} Service Account Role"
   permissions = [
     "storage.objects.create",
     "storage.objects.delete",
@@ -195,6 +278,69 @@ resource "google_project_iam_binding" "automq_byoc_sa_binding" {
   ]
 }
 
+resource "google_project_iam_binding" "gke_permission_binding0" {
+  project = var.cloud_project_id
+  role    = "roles/logging.logWriter"
+
+  members = [
+    "serviceAccount:${google_service_account.automq_byoc_sa.email}",
+  ]
+}
+
+resource "google_project_iam_binding" "gke_permission_binding1" {
+  project = var.cloud_project_id
+  role    = "roles/monitoring.metricWriter"
+
+  members = [
+    "serviceAccount:${google_service_account.automq_byoc_sa.email}",
+  ]
+}
+
+resource "google_project_iam_binding" "gke_permission_binding2" {
+  project = var.cloud_project_id
+  role    = "roles/monitoring.viewer"
+
+  members = [
+    "serviceAccount:${google_service_account.automq_byoc_sa.email}",
+  ]
+}
+
+resource "google_project_iam_binding" "gke_permission_binding3" {
+  project = var.cloud_project_id
+  role    = "roles/stackdriver.resourceMetadata.writer"
+
+  members = [
+    "serviceAccount:${google_service_account.automq_byoc_sa.email}",
+  ]
+}
+
+resource "google_project_iam_binding" "gke_permission_binding4" {
+  project = var.cloud_project_id
+  role    = "roles/autoscaling.metricsWriter"
+
+  members = [
+    "serviceAccount:${google_service_account.automq_byoc_sa.email}",
+  ]
+}
+
+resource "google_project_iam_binding" "gke_permission_binding5" {
+  project = var.cloud_project_id
+  role    = "roles/artifactregistry.reader"
+
+  members = [
+    "serviceAccount:${google_service_account.automq_byoc_sa.email}",
+  ]
+}
+
+resource "google_project_iam_binding" "gke_permission_binding6" {
+  project = var.cloud_project_id
+  role    = "roles/resourcemanager.tagUser"
+
+  members = [
+    "serviceAccount:${google_service_account.automq_byoc_sa.email}",
+  ]
+}
+
 # Firewall rules
 resource "google_compute_firewall" "automq_byoc_console_sg" {
   name    = "automq-byoc-console-${var.automq_byoc_env_id}"
@@ -217,12 +363,12 @@ resource "google_compute_address" "web_ip" {
 }
 
 data "google_compute_image" "console_image" {
-  name = "automq-control-center-base-image-test-main-11051317-x86-64"
+  name = "automq-control-center-test-0-0-1-snapshot-20241105-11-46-x86-64"
 }
 
 data "google_compute_network" "vpc" {
-  depends_on = [ module.automq_byoc_vpc ]
-  name = local.automq_byoc_vpc_name
+  depends_on = [module.automq_byoc_vpc]
+  name       = local.automq_byoc_vpc_name
 }
 
 resource "google_dns_managed_zone" "private_dns_zone" {

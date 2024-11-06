@@ -217,7 +217,7 @@ resource "google_compute_address" "web_ip" {
 }
 
 data "google_compute_image" "console_image" {
-  name = "automq-control-center-test-0-0-1-snapshot-20241105-05-23-x86-64"
+  name = "automq-control-center-base-image-test-main-11051317-x86-64"
 }
 
 data "google_compute_network" "vpc" {

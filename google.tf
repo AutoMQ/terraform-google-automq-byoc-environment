@@ -12,36 +12,83 @@ locals {
 
 # GCS bucket instead of S3
 module "automq_byoc_data_bucket" {
-  source  = "terraform-google-modules/cloud-storage/google"
-  version = "~> 3.4"
+  source  = "terraform-google-modules/cloud-storage/google//modules/simple_bucket"
+  version = "~> 8.0"
 
   count = var.automq_byoc_data_bucket_name == "" ? 1 : 0
 
-  prefix     = ""
-  names      = ["automq-data-${var.automq_byoc_env_id}"]
+  location   = var.cloud_provider_region
+
+  name       = "automq-data-${var.automq_byoc_env_id}"
   project_id = var.cloud_project_id
+  bucket_policy_only = true
+  force_destroy = true
+
+  soft_delete_policy = {
+    retention_period = 0
+  }
 
   labels = {
     automq_vendor         = "automq"
     automq_environment_id = var.automq_byoc_env_id
   }
+
+  iam_members = [
+    {
+      role    = google_project_iam_custom_role.automq_byoc_role.name
+      members = ["serviceAccount:${google_service_account.automq_byoc_sa.email}"]
+    }
+  ]
 }
 
 # GCS ops bucket
+# GCS bucket instead of S3
 module "automq_byoc_ops_bucket" {
-  source  = "terraform-google-modules/cloud-storage/google"
-  version = "~> 3.4"
+  source  = "terraform-google-modules/cloud-storage/google//modules/simple_bucket"
+  version = "~> 8.0"
 
-  count = var.automq_byoc_ops_bucket_name == "" ? 1 : 0
+  count = var.automq_byoc_data_bucket_name == "" ? 1 : 0
 
-  prefix     = ""
-  names      = ["automq-ops-${var.automq_byoc_env_id}"]
+  location   = var.cloud_provider_region
+
+  name       = "automq-ops-${var.automq_byoc_env_id}"
   project_id = var.cloud_project_id
+  bucket_policy_only = true
+  force_destroy = true
+
+  soft_delete_policy = {
+    retention_period = 0
+  }
 
   labels = {
     automq_vendor         = "automq"
     automq_environment_id = var.automq_byoc_env_id
   }
+
+  iam_members = [
+    {
+      role    = google_project_iam_custom_role.automq_byoc_role.name
+      members = ["serviceAccount:${google_service_account.automq_byoc_sa.email}"]
+    }
+  ]
+}
+
+resource "google_storage_bucket_iam_binding" "automq_data_storage_permission_binding" {
+  count = var.automq_byoc_data_bucket_name != "" ? 1 : 0
+  bucket = var.automq_byoc_data_bucket_name
+  role   = google_project_iam_custom_role.automq_byoc_role.name
+  members = [
+    "serviceAccount:${google_service_account.automq_byoc_sa.email}"
+  ]
+}
+
+resource "google_storage_bucket_iam_binding" "automq_ops_storage_permission_binding" {
+  count = var.automq_byoc_ops_bucket_name != "" ? 1 : 0
+  bucket = var.automq_byoc_ops_bucket_name
+  role   = google_project_iam_custom_role.automq_byoc_role.name
+  members = [
+    "serviceAccount:${google_service_account.automq_byoc_sa.email}"
+  ]
 }
 
 # VPC Network
@@ -103,6 +150,7 @@ resource "google_project_iam_custom_role" "automq_byoc_role" {
     "container.auditSinks.create",
     "container.auditSinks.delete",
     "container.auditSinks.get",
+    "container.nodes.list",
     "container.clusters.connect",
     "container.clusters.create",
     "container.clusters.createTagBinding",

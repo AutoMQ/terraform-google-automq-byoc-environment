@@ -76,19 +76,19 @@ module "automq_byoc_vpc" {
 
   subnets = [
     {
-      subnet_name           = "public-subnet"
+      subnet_name           = "public-subnet-${var.automq_byoc_env_id}"
       subnet_ip             = "10.0.0.0/20"
       subnet_region         = var.cloud_provider_region
       subnet_private_access = true
     },
     {
-      subnet_name           = "private-subnet-1"
+      subnet_name           = "private-subnet-${var.automq_byoc_env_id}-1"
       subnet_ip             = "10.0.128.0/20"
       subnet_region         = var.cloud_provider_region
       subnet_private_access = true
     },
     {
-      subnet_name           = "private-subnet-2"
+      subnet_name           = "private-subnet-${var.automq_byoc_env_id}-2"
       subnet_ip             = "10.0.144.0/20"
       subnet_region         = var.cloud_provider_region
       subnet_private_access = true
@@ -221,6 +221,7 @@ data "google_compute_image" "console_image" {
 }
 
 data "google_compute_network" "vpc" {
+  depends_on = [ module.automq_byoc_vpc ]
   name = local.automq_byoc_vpc_name
 }
 

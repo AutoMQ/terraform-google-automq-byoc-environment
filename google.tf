@@ -321,8 +321,12 @@ resource "google_compute_address" "web_ip" {
   region  = var.cloud_provider_region
 }
 
+
+locals {
+  console_image_name = var.use_custom_image ? var.automq_byoc_env_console_image : "automq-control-center-prod-${var.automq_byoc_env_version}-x86_64"
+}
 data "google_compute_image" "console_image" {
-  name = "automq-control-center-test-0-0-1-snapshot-20241105-11-46-x86-64"
+  name = local.console_image_name
 }
 
 data "google_compute_network" "vpc" {

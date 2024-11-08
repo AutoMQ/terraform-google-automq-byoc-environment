@@ -147,6 +147,48 @@ resource "google_project_iam_custom_role" "automq_byoc_storage_role" {
   ]
 }
 
+resource "google_project_iam_custom_role" "automq_byoc_compute_role" {
+  role_id     = replace("automq_byoc_compute_sa_role_${var.automq_byoc_env_id}", "-", "_")
+  title       = "AutoMQ BYOC ${var.automq_byoc_env_id} Compute Role"
+  description = "AutoMQ BYOC ${var.automq_byoc_env_id} Compute Role"
+  permissions = [
+    "compute.instances.get",
+    "compute.disks.get",
+    "compute.instances.list",
+    "compute.networks.get",
+    "compute.networks.list",
+
+    "compute.instances.create"
+  ]
+}
+
+resource "google_project_iam_custom_role" "automq_byoc_dns_role" {
+  role_id     = replace("automq_byoc_dns_sa_role_${var.automq_byoc_env_id}", "-", "_")
+  title       = "AutoMQ BYOC ${var.automq_byoc_env_id} DNS Role"
+  description = "AutoMQ BYOC ${var.automq_byoc_env_id} DNS Role"
+  permissions = [
+    "dns.changes.create",
+    "dns.managedZones.get",
+    "dns.resourceRecordSets.create",
+    "dns.resourceRecordSets.delete",
+    "dns.resourceRecordSets.get",
+    "dns.resourceRecordSets.list",
+    "dns.resourceRecordSets.update",
+    
+    "orgpolicy.policy.get"
+  ]
+}
+
+resource "google_project_iam_custom_role" "automq_byoc_resource_role" {
+  role_id     = replace("automq_byoc_resource_sa_role_${var.automq_byoc_env_id}", "-", "_")
+  title       = "AutoMQ BYOC ${var.automq_byoc_env_id} ResourceManager Role"
+  description = "AutoMQ BYOC ${var.automq_byoc_env_id} ResourceManager Role"
+  permissions = [
+    "resourcemanager.projects.get",
+  ]
+}
+
+
 resource "google_project_iam_custom_role" "automq_byoc_gke_role" {
   role_id     = replace("automq_byoc_gke_sa_role_${var.automq_byoc_env_id}", "-", "_")
   title       = "AutoMQ BYOC ${var.automq_byoc_env_id} GKE Role"
@@ -222,6 +264,30 @@ resource "google_project_iam_custom_role" "automq_byoc_gke_role" {
     "container.statefulSets.update",
     "container.statefulSets.updateScale",
     "container.statefulSets.updateStatus"
+  ]
+}
+
+resource "google_project_iam_binding" "automq_byoc_dns_sa_binding" {
+  project = var.cloud_project_id
+  role    = google_project_iam_custom_role.automq_byoc_dns_role.name
+  members = [
+    "serviceAccount:${google_service_account.automq_byoc_sa.email}"
+  ]
+}
+
+resource "google_project_iam_binding" "automq_byoc_resource_sa_binding" {
+  project = var.cloud_project_id
+  role    = google_project_iam_custom_role.automq_byoc_resource_role.name
+  members = [
+    "serviceAccount:${google_service_account.automq_byoc_sa.email}"
+  ]
+}
+
+resource "google_project_iam_binding" "automq_byoc_compute_sa_binding" {
+  project = var.cloud_project_id
+  role    = google_project_iam_custom_role.automq_byoc_compute_role.name
+  members = [
+    "serviceAccount:${google_service_account.automq_byoc_sa.email}"
   ]
 }
 

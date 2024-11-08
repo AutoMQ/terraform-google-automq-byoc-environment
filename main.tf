@@ -29,8 +29,7 @@ resource "google_compute_instance" "automq_byoc_console" {
     automq_ops_bucket          = local.automq_ops_bucket,
     instance_service_account   = google_service_account.automq_byoc_sa.account_id,
     environment_id             = var.automq_byoc_env_id
-    instance_security_group_id = google_compute_firewall.automq_byoc_console_sg.id
-    instance_dns               = google_dns_managed_zone.private_dns_zone.id
+    instance_dns               = google_dns_managed_zone.private_dns_zone.name
     deploy_type                = var.automq_byoc_default_deploy_type
   })
 
@@ -66,8 +65,8 @@ resource "google_compute_disk" "data_volume" {
 }
 
 resource "google_compute_attached_disk" "data_volume_attachment" {
-  instance    = google_compute_instance.automq_byoc_console.name
+  instance    = google_compute_instance.automq_byoc_console.id
   zone        = var.cloud_provider_zone
-  disk        = google_compute_disk.data_volume.name
+  disk        = google_compute_disk.data_volume.id
   device_name = "data-volume-attachment-${var.automq_byoc_env_id}"
 }

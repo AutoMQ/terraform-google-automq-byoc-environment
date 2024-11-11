@@ -157,6 +157,7 @@ resource "google_project_iam_custom_role" "automq_byoc_compute_role" {
     "compute.instances.list",
     "compute.networks.get",
     "compute.networks.list",
+    "compute.subnetworks.get"
   ]
 }
 

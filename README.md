@@ -183,7 +183,7 @@ output "automq_byoc_google_service_account" {
 
 # Helpful Links/Information
 
-* [Report Bugs](https://github.com/AutoMQ/terraform-gcp-automq-byoc-environment/issues)
+* [Report Bugs](https://github.com/AutoMQ/terraform-google-automq-byoc-environment/issues)
 
 * [AutoMQ Cloud Documents](https://docs.automq.com/automq-cloud/overview)
 

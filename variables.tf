@@ -61,7 +61,7 @@ variable "automq_byoc_ops_bucket_name" {
 variable "automq_byoc_machine_type" {
   description = "Set the Compute Engine machine type; this parameter is used only for deploying the AutoMQ environment console. You need to provide a machine type with at least 2 cores and 8 GB of memory."
   type        = string
-  default     = "e2-standard-2"  # GCP equivalent of t3.large
+  default     = "e2-standard-2" # GCP equivalent of t3.large
 }
 
 variable "automq_byoc_env_version" {
@@ -88,6 +88,6 @@ variable "automq_byoc_default_deploy_type" {
     condition     = var.automq_byoc_default_deploy_type == "k8s"
     error_message = "Currently, only 'k8s' is supported for automq_byoc_default_deploy_type."
   }
-  type        = string
-  default     = "k8s"
+  type    = string
+  default = "k8s"
 }

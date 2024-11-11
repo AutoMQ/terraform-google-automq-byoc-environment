@@ -157,8 +157,6 @@ resource "google_project_iam_custom_role" "automq_byoc_compute_role" {
     "compute.instances.list",
     "compute.networks.get",
     "compute.networks.list",
-
-    "compute.instances.create"
   ]
 }
 
@@ -174,8 +172,6 @@ resource "google_project_iam_custom_role" "automq_byoc_dns_role" {
     "dns.resourceRecordSets.get",
     "dns.resourceRecordSets.list",
     "dns.resourceRecordSets.update",
-    
-    "orgpolicy.policy.get"
   ]
 }
 
@@ -298,8 +294,8 @@ resource "google_project_iam_binding" "automq_byoc_gke_sa_binding" {
     "serviceAccount:${google_service_account.automq_byoc_sa.email}"
   ]
   condition {
-    title       = "AutoMQ BYOC ${var.automq_byoc_env_id} GKE Role Condition"
-    expression  = "resource.matchTag(\"${var.cloud_project_id}/automqAssigned\", \"automq\")"
+    title      = "AutoMQ BYOC ${var.automq_byoc_env_id} GKE Role Condition"
+    expression = "resource.matchTag(\"${var.cloud_project_id}/automqAssigned\", \"automq\")"
   }
 }
 

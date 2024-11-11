@@ -25,12 +25,12 @@ resource "google_compute_instance" "automq_byoc_console" {
   }
 
   metadata_startup_script = templatefile("${path.module}/tpls/userdata.tpl", {
-    automq_data_bucket         = local.automq_data_bucket,
-    automq_ops_bucket          = local.automq_ops_bucket,
-    instance_service_account   = google_service_account.automq_byoc_sa.account_id,
-    environment_id             = var.automq_byoc_env_id
-    instance_dns               = google_dns_managed_zone.private_dns_zone.name
-    deploy_type                = var.automq_byoc_default_deploy_type
+    automq_data_bucket       = local.automq_data_bucket,
+    automq_ops_bucket        = local.automq_ops_bucket,
+    instance_service_account = google_service_account.automq_byoc_sa.account_id,
+    environment_id           = var.automq_byoc_env_id
+    instance_dns             = google_dns_managed_zone.private_dns_zone.name
+    deploy_type              = var.automq_byoc_default_deploy_type
   })
 
   labels = {
@@ -40,16 +40,16 @@ resource "google_compute_instance" "automq_byoc_console" {
 }
 
 resource "google_tags_location_tag_binding" "compute_instance_vendor_tag_binding" {
-  depends_on = [ google_compute_instance.automq_byoc_console ]
-  parent    = "//compute.googleapis.com/projects/${data.google_project.project.number}/zones/${var.cloud_provider_zone}/instances/${google_compute_instance.automq_byoc_console.instance_id}"
-  tag_value = "tagValues/${google_tags_tag_value.automqVendorValue.name}"
-  location = var.cloud_provider_zone
+  depends_on = [google_compute_instance.automq_byoc_console]
+  parent     = "//compute.googleapis.com/projects/${data.google_project.project.number}/zones/${var.cloud_provider_zone}/instances/${google_compute_instance.automq_byoc_console.instance_id}"
+  tag_value  = "tagValues/${google_tags_tag_value.automqVendorValue.name}"
+  location   = var.cloud_provider_zone
 }
 resource "google_tags_location_tag_binding" "compute_instance_env_tag_binding" {
-  depends_on = [ google_compute_instance.automq_byoc_console ]
-  parent    = "//compute.googleapis.com/projects/${data.google_project.project.number}/zones/${var.cloud_provider_zone}/instances/${google_compute_instance.automq_byoc_console.instance_id}"
-  tag_value = "tagValues/${google_tags_tag_value.automqEnvValue.name}"
-  location = var.cloud_provider_zone
+  depends_on = [google_compute_instance.automq_byoc_console]
+  parent     = "//compute.googleapis.com/projects/${data.google_project.project.number}/zones/${var.cloud_provider_zone}/instances/${google_compute_instance.automq_byoc_console.instance_id}"
+  tag_value  = "tagValues/${google_tags_tag_value.automqEnvValue.name}"
+  location   = var.cloud_provider_zone
 }
 
 resource "google_compute_disk" "data_volume" {

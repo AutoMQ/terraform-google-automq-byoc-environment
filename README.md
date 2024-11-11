@@ -1,6 +1,6 @@
 
 # GCP AutoMQ BYOC Environment Terraform module
-![General_Availability](https://img.shields.io/badge/Lifecycle_Stage-General_Availability(GA)-green?style=flat&logoColor=8A3BE2&labelColor=rgba)
+![Preview](https://img.shields.io/badge/Lifecycle_Stage-Preview-blue?style=flat&logoColor=8A3BE2&labelColor=rgba)
 
 This module is designed for deploying the AutoMQ BYOC (Bring Your Own Cloud) environment using the GCP Provider within a GCP cloud environment.
 

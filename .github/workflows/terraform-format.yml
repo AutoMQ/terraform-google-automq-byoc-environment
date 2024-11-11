@@ -14,7 +14,7 @@ jobs:
         uses: dflook/terraform-fmt-check@v1
         id: fmt-check
         with:
-          path: huaweicloud
+          path: .
 
       - name: Wrong formatting found
         if: ${{ failure() && steps.fmt-check.outputs.failure-reason == 'check-failed' }}

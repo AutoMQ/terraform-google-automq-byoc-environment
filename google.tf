@@ -202,6 +202,7 @@ resource "google_project_iam_custom_role" "automq_byoc_gke_role" {
     "container.auditSinks.delete",
     "container.auditSinks.get",
     "container.nodes.list",
+    "container.networkPolicies.get",
     "container.clusters.connect",
     "container.clusters.create",
     "container.clusters.createTagBinding",

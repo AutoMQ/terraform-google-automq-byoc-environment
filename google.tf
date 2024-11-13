@@ -4,8 +4,8 @@ provider "google" {
 }
 
 locals {
-  automq_byoc_vpc_name                       = var.create_new_vpc ? module.automq_byoc_vpc[0].network_name : var.existing_vpc_name
-  automq_byoc_env_console_public_subnet_name = var.create_new_vpc ? module.automq_byoc_vpc[0].subnets_names[0] : var.existing_subnet_name
+  automq_byoc_vpc_name                       = var.create_new_vpc ? google_compute_network.automq_network[0].name : var.existing_vpc_name
+  automq_byoc_env_console_public_subnet_name = var.create_new_vpc ? google_compute_subnetwork.automq_subnetwork[0].name : var.existing_subnet_name
   automq_data_bucket                         = var.automq_byoc_data_bucket_name == "" ? google_storage_bucket.automq_byoc_data_bucket[0].name : var.automq_byoc_data_bucket_name
   automq_ops_bucket                          = var.automq_byoc_ops_bucket_name == "" ? google_storage_bucket.automq_byoc_ops_bucket[0].name : var.automq_byoc_ops_bucket_name
 
@@ -96,34 +96,39 @@ resource "google_storage_bucket_iam_binding" "automq_ops_storage_permission_bind
 }
 
 # VPC Network
-module "automq_byoc_vpc" {
-  source  = "terraform-google-modules/network/google"
-  version = "~> 7.0"
+resource "google_compute_network" "automq_network" {
+  count = var.create_new_vpc ? 1 : 0
 
-  count        = var.create_new_vpc ? 1 : 0
-  project_id   = var.cloud_project_id
-  network_name = lower(replace("automq_byoc_vpc_${var.automq_byoc_env_id}", "_", "-"))
+  name = lower(replace("automq_byoc_vpc_${var.automq_byoc_env_id}", "_", "-"))
+  project = var.cloud_project_id
 
-  subnets = [
-    {
-      subnet_name           = "public-subnet-${var.automq_byoc_env_id}"
-      subnet_ip             = "10.0.0.0/20"
-      subnet_region         = var.cloud_provider_region
-      subnet_private_access = true
-    },
-    {
-      subnet_name           = "private-subnet-${var.automq_byoc_env_id}-1"
-      subnet_ip             = "10.0.128.0/20"
-      subnet_region         = var.cloud_provider_region
-      subnet_private_access = true
-    },
-    {
-      subnet_name           = "private-subnet-${var.automq_byoc_env_id}-2"
-      subnet_ip             = "10.0.144.0/20"
-      subnet_region         = var.cloud_provider_region
-      subnet_private_access = true
-    }
-  ]
+  auto_create_subnetworks = false
+}
+
+resource "google_compute_subnetwork" "automq_subnetwork" {
+  count = var.create_new_vpc ? 1 : 0
+
+  name = "console-subnet-${var.automq_byoc_env_id}"
+
+  ip_cidr_range = "10.0.0.0/20"
+  region        = var.cloud_provider_region
+
+  stack_type = "IPV4_ONLY"
+
+  network = google_compute_network.automq_network[0].id
+}
+
+resource "google_compute_subnetwork" "gke_subnetwork" {
+  count = var.create_new_vpc ? 1 : 0
+
+  name = "gke-subnet-${var.automq_byoc_env_id}"
+
+  ip_cidr_range = "10.1.0.0/20"
+  region        = var.cloud_provider_region
+
+  stack_type = "IPV4_ONLY"
+
+  network = google_compute_network.automq_network[0].id
 }
 
 # Service Account
@@ -144,6 +149,7 @@ resource "google_project_iam_custom_role" "automq_byoc_storage_role" {
     "storage.objects.list",
     "storage.objects.setRetention",
     "storage.objects.update",
+    "storage.multipartUploads.create",
   ]
 }
 
@@ -367,7 +373,7 @@ resource "google_project_iam_binding" "gke_permission_binding6" {
 # Firewall rules
 resource "google_compute_firewall" "automq_byoc_console_sg" {
   name    = "automq-byoc-console-${var.automq_byoc_env_id}"
-  network = var.create_new_vpc ? module.automq_byoc_vpc[0].network_name : var.existing_vpc_name
+  network = local.automq_byoc_vpc_name
   project = var.cloud_project_id
 
   allow {
@@ -394,9 +400,10 @@ data "google_compute_image" "console_image" {
 }
 
 data "google_compute_network" "vpc" {
-  depends_on = [module.automq_byoc_vpc]
+  depends_on = [ google_compute_network.automq_network ]
   name       = local.automq_byoc_vpc_name
 }
+
 
 resource "google_dns_managed_zone" "private_dns_zone" {
   name     = "automq-byoc-private-zone-${var.automq_byoc_env_id}"
@@ -404,9 +411,11 @@ resource "google_dns_managed_zone" "private_dns_zone" {
 
   private_visibility_config {
     networks {
-      network_url = var.create_new_vpc ? module.automq_byoc_vpc[0].network_name : data.google_compute_network.vpc.self_link
+      network_url = data.google_compute_network.vpc.self_link
     }
   }
+
+  visibility = "private"
 
   labels = {
     automq_vendor         = "automq"

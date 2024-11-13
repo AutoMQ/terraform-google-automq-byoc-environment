@@ -209,6 +209,7 @@ resource "google_project_iam_custom_role" "automq_byoc_gke_role" {
     "container.auditSinks.get",
     "container.nodes.list",
     "container.networkPolicies.get",
+    "container.networkPolicies.create",
     "container.clusters.connect",
     "container.clusters.create",
     "container.clusters.createTagBinding",
@@ -426,3 +427,181 @@ resource "google_dns_managed_zone" "private_dns_zone" {
     create_before_destroy = true
   }
 }
+
+
+resource "google_dns_managed_zone" "private_googleapis" {
+  name        = "private-googleapis"
+  dns_name    = "googleapis.com."
+  description = "Private zone for Google APIs"
+
+  visibility = "private"
+  private_visibility_config {
+    networks {
+      network_url = data.google_compute_network.vpc.self_link
+    }
+  }
+}
+
+resource "google_dns_record_set" "wildcard_googleapis_cname" {
+  name         = "*.googleapis.com."
+  managed_zone = google_dns_managed_zone.private_googleapis.name
+  type         = "CNAME"
+  ttl          = 300
+  rrdatas      = ["private.googleapis.com."]
+}
+
+resource "google_dns_record_set" "private_googleapis_ipv4" {
+  name         = "private.googleapis.com."
+  managed_zone = google_dns_managed_zone.private_googleapis.name
+  type         = "A"
+  ttl          = 300
+  rrdatas      = ["199.36.153.8", "199.36.153.9", "199.36.153.10", "199.36.153.11"]
+}
+
+resource "google_compute_route" "route_ipv4_googleapi" {
+  name             = "route-to-googleapis-ipv4"
+  network          = data.google_compute_network.vpc.id
+  dest_range       = "199.36.153.8/30"
+  next_hop_gateway = "global/gateways/default-internet-gateway"
+
+  priority = 90
+}
+
+resource "google_compute_route" "route_ipv4_googleapi_additional" {
+  name             = "route-to-googleapis-ipv4-additional"
+  network          = data.google_compute_network.vpc.id
+  dest_range       = "34.126.0.0/18"
+  next_hop_gateway = "global/gateways/default-internet-gateway"
+
+  priority = 90
+}
+
+resource "google_compute_firewall" "allow_googleapis_ipv4" {
+  name    = "allow-outbound-googleapis-ipv4"
+  network = data.google_compute_network.vpc.name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["443"]
+  }
+
+  destination_ranges = [
+    "199.36.153.8/30",
+    "34.126.0.0/18"
+  ]
+
+  direction = "EGRESS"
+}
+
+
+
+# Create GKE cluster and node pool
+resource "google_container_cluster" "automq_gke_cluster" {
+  name = "gke-cluster-${var.automq_byoc_env_id}"
+
+  location                 = var.cloud_provider_zone
+  enable_l4_ilb_subsetting = true
+
+  network    = local.automq_byoc_vpc_name
+  subnetwork = google_compute_subnetwork.gke_subnetwork[0].id
+
+  networking_mode = "VPC_NATIVE"
+
+  release_channel {
+    channel = "STABLE"
+  }
+
+  addons_config {
+    dns_cache_config {
+      enabled = true
+    }
+    gce_persistent_disk_csi_driver_config {
+      enabled = true
+    }
+  }
+
+  datapath_provider = "ADVANCED_DATAPATH"
+
+  remove_default_node_pool = true
+  initial_node_count       = 1
+
+  # Set `deletion_protection` to `true` will ensure that one cannot
+  # accidentally delete this instance by use of Terraform.
+  deletion_protection = false
+}
+
+
+resource "google_tags_tag_key" "automqAssignedKey" {
+  parent     = "projects/${var.cloud_project_id}"
+  short_name = "automqAssigned"
+}
+
+resource "google_tags_tag_value" "automqAssignedValue" {
+  parent     = "tagKeys/${google_tags_tag_key.automqEnvKey.name}"
+  short_name = "automq"
+}
+
+
+resource "google_container_node_pool" "automq_gke_node_pool" {
+  name       = "node-pool-${var.automq_byoc_env_id}"
+  location   = var.cloud_provider_region
+  cluster    = google_container_cluster.automq_gke_cluster.id
+  node_count = 1
+
+  node_config {
+    machine_type = "n2d-standard-4"
+
+    disk_type    = "pd-ssd"
+    disk_size_gb = 20
+
+    workload_metadata_config {
+      mode = "GCE_METADATA" // GKE_METADATA for workload identity
+    }
+
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    service_account = google_service_account.automq_byoc_sa.email
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/cloud-platform"
+    ]
+  }
+
+  autoscaling {
+    total_min_node_count = 3
+    total_max_node_count = 9
+    location_policy      = "BALANCED"
+  }
+
+  management {
+    auto_repair  = false
+    auto_upgrade = true
+  }
+}
+
+resource "google_compute_router" "router" {
+  project = var.cloud_project_id
+  name    = "nat-router-${var.automq_byoc_env_id}"
+  network = local.automq_byoc_vpc_name
+  region  = var.cloud_provider_region
+}
+
+resource "google_compute_router" "vpc_router" {
+  name    = "vpc-router-${var.automq_byoc_env_id}"
+  network = data.google_compute_network.vpc.id
+  region  = var.cloud_provider_region
+}
+
+resource "google_compute_router_nat" "vpc_nat" {
+  name   = "vpc-nat-gateway-${var.automq_byoc_env_id}"
+  router = google_compute_router.vpc_router.name
+  region = var.cloud_provider_region
+
+  nat_ip_allocate_option = "AUTO_ONLY"
+
+  source_subnetwork_ip_ranges_to_nat = "LIST_OF_SUBNETWORKS"
+
+  subnetwork {
+    name                    = google_compute_subnetwork.gke_subnetwork[0].name
+    source_ip_ranges_to_nat = [google_compute_subnetwork.gke_subnetwork[0].ip_cidr_range]
+  }
+}
+

@@ -79,8 +79,15 @@ resource "google_storage_bucket" "automq_byoc_ops_bucket" {
   }
 }
 
+data "google_storage_bucket" "ops_bucket" {
+  name = local.automq_ops_bucket
+}
+data "google_storage_bucket" "data_bucket" {
+  name = local.automq_data_bucket
+}
+
 resource "google_storage_bucket_iam_binding" "automq_data_storage_permission_binding" {
-  bucket = local.automq_data_bucket
+  bucket = data.google_storage_bucket.data_bucket.name
   role   = google_project_iam_custom_role.automq_byoc_storage_role.name
   members = [
     "serviceAccount:${google_service_account.automq_byoc_sa.email}"
@@ -88,7 +95,7 @@ resource "google_storage_bucket_iam_binding" "automq_data_storage_permission_bin
 }
 
 resource "google_storage_bucket_iam_binding" "automq_ops_storage_permission_binding" {
-  bucket = local.automq_ops_bucket
+  bucket = data.google_storage_bucket.ops_bucket.name
   role   = google_project_iam_custom_role.automq_byoc_storage_role.name
   members = [
     "serviceAccount:${google_service_account.automq_byoc_sa.email}"

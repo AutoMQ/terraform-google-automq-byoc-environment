@@ -277,7 +277,11 @@ resource "google_project_iam_custom_role" "automq_byoc_gke_role" {
     "container.statefulSets.list",
     "container.statefulSets.update",
     "container.statefulSets.updateScale",
-    "container.statefulSets.updateStatus"
+    "container.statefulSets.updateStatus",
+    "container.storageClasses.create",
+    "container.storageClasses.get",
+    "container.storageClasses.list",
+    "container.storageClasses.update",
   ]
 }
 

@@ -80,12 +80,12 @@ resource "google_storage_bucket" "automq_byoc_ops_bucket" {
 }
 
 data "google_storage_bucket" "ops_bucket" {
-  depends_on = [ google_storage_bucket.automq_byoc_ops_bucket ]
-  name = local.automq_ops_bucket
+  depends_on = [google_storage_bucket.automq_byoc_ops_bucket]
+  name       = local.automq_ops_bucket
 }
 data "google_storage_bucket" "data_bucket" {
-  depends_on = [ google_storage_bucket.automq_byoc_data_bucket ]
-  name = local.automq_data_bucket
+  depends_on = [google_storage_bucket.automq_byoc_data_bucket]
+  name       = local.automq_data_bucket
 }
 
 resource "google_storage_bucket_iam_binding" "automq_data_storage_permission_binding" {
@@ -108,7 +108,7 @@ resource "google_storage_bucket_iam_binding" "automq_ops_storage_permission_bind
 resource "google_compute_network" "automq_network" {
   count = var.create_new_vpc ? 1 : 0
 
-  name = lower(replace("automq_byoc_vpc_${var.automq_byoc_env_id}", "_", "-"))
+  name    = lower(replace("automq_byoc_vpc_${var.automq_byoc_env_id}", "_", "-"))
   project = var.cloud_project_id
 
   auto_create_subnetworks = false
@@ -411,13 +411,13 @@ locals {
 }
 data "google_compute_image" "console_image" {
   name = lower(
-    replace(replace(local.console_image_name, 
-    "_", "-"), 
-    ".", "-"))
+    replace(replace(local.console_image_name,
+      "_", "-"),
+  ".", "-"))
 }
 
 data "google_compute_network" "vpc" {
-  depends_on = [ google_compute_network.automq_network ]
+  depends_on = [google_compute_network.automq_network]
   name       = local.automq_byoc_vpc_name
 }
 

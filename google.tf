@@ -446,7 +446,7 @@ resource "google_dns_managed_zone" "private_dns_zone" {
 
 
 resource "google_dns_managed_zone" "private_googleapis" {
-  name        = "private-googleapis"
+  name        = "private-gapis-${var.automq_byoc_env_id}"
   dns_name    = "googleapis.com."
   description = "Private zone for Google APIs"
 
@@ -467,7 +467,7 @@ resource "google_dns_record_set" "wildcard_googleapis_cname" {
 }
 
 resource "google_dns_record_set" "private_googleapis_ipv4" {
-  name         = "private.googleapis.com."
+  name         = "private.gapis.com."
   managed_zone = google_dns_managed_zone.private_googleapis.name
   type         = "A"
   ttl          = 300
@@ -475,7 +475,7 @@ resource "google_dns_record_set" "private_googleapis_ipv4" {
 }
 
 resource "google_compute_route" "route_ipv4_googleapi" {
-  name             = "route-to-googleapis-ipv4"
+  name             = "route-to-gapis-ipv4-${var.automq_byoc_env_id}"
   network          = data.google_compute_network.vpc.id
   dest_range       = "199.36.153.8/30"
   next_hop_gateway = "global/gateways/default-internet-gateway"
@@ -484,7 +484,7 @@ resource "google_compute_route" "route_ipv4_googleapi" {
 }
 
 resource "google_compute_route" "route_ipv4_googleapi_additional" {
-  name             = "route-to-googleapis-ipv4-additional"
+  name             = "route-to-gapis-ipv4-additional-${var.automq_byoc_env_id}"
   network          = data.google_compute_network.vpc.id
   dest_range       = "34.126.0.0/18"
   next_hop_gateway = "global/gateways/default-internet-gateway"
@@ -493,7 +493,7 @@ resource "google_compute_route" "route_ipv4_googleapi_additional" {
 }
 
 resource "google_compute_firewall" "allow_googleapis_ipv4" {
-  name    = "allow-outbound-googleapis-ipv4"
+  name    = "allow-out-gapis-ipv4-${var.automq_byoc_env_id}"
   network = data.google_compute_network.vpc.name
 
   allow {

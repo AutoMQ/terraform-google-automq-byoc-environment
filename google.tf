@@ -321,67 +321,53 @@ resource "google_project_iam_binding" "automq_byoc_gke_sa_binding" {
   }
 }
 
-resource "google_project_iam_binding" "gke_permission_binding0" {
+resource "google_project_iam_member" "gke_permission_binding0" {
   project = var.cloud_project_id
   role    = "roles/logging.logWriter"
 
-  members = [
-    "serviceAccount:${google_service_account.automq_byoc_sa.email}",
-  ]
+  member = "serviceAccount:${google_service_account.automq_byoc_sa.email}"
 }
 
-resource "google_project_iam_binding" "gke_permission_binding1" {
+resource "google_project_iam_member" "gke_permission_binding1" {
   project = var.cloud_project_id
   role    = "roles/monitoring.metricWriter"
 
-  members = [
-    "serviceAccount:${google_service_account.automq_byoc_sa.email}",
-  ]
+  member = "serviceAccount:${google_service_account.automq_byoc_sa.email}"
 }
 
-resource "google_project_iam_binding" "gke_permission_binding2" {
+resource "google_project_iam_member" "gke_permission_binding2" {
   project = var.cloud_project_id
   role    = "roles/monitoring.viewer"
 
-  members = [
-    "serviceAccount:${google_service_account.automq_byoc_sa.email}",
-  ]
+  member = "serviceAccount:${google_service_account.automq_byoc_sa.email}"
 }
 
-resource "google_project_iam_binding" "gke_permission_binding3" {
+resource "google_project_iam_member" "gke_permission_binding3" {
   project = var.cloud_project_id
   role    = "roles/stackdriver.resourceMetadata.writer"
 
-  members = [
-    "serviceAccount:${google_service_account.automq_byoc_sa.email}",
-  ]
+  member = "serviceAccount:${google_service_account.automq_byoc_sa.email}"
 }
 
-resource "google_project_iam_binding" "gke_permission_binding4" {
+resource "google_project_iam_member" "gke_permission_binding4" {
   project = var.cloud_project_id
   role    = "roles/autoscaling.metricsWriter"
 
-  members = [
-    "serviceAccount:${google_service_account.automq_byoc_sa.email}",
-  ]
+  member = "serviceAccount:${google_service_account.automq_byoc_sa.email}"
 }
 
-resource "google_project_iam_binding" "gke_permission_binding5" {
+resource "google_project_iam_member" "gke_permission_binding5" {
   project = var.cloud_project_id
   role    = "roles/artifactregistry.reader"
 
-  members = [
-    "serviceAccount:${google_service_account.automq_byoc_sa.email}",
-  ]
+  member = "serviceAccount:${google_service_account.automq_byoc_sa.email}"
 }
 
-resource "google_project_iam_binding" "gke_permission_binding6" {
+resource "google_project_iam_member" "gke_permission_binding6" {
   project = var.cloud_project_id
   role    = "roles/resourcemanager.tagUser"
 
-  members = [
-    "serviceAccount:${google_service_account.automq_byoc_sa.email}",
-  ]
+  member = "serviceAccount:${google_service_account.automq_byoc_sa.email}"
 }
 
 # Firewall rules
@@ -467,7 +453,7 @@ resource "google_dns_record_set" "wildcard_googleapis_cname" {
 }
 
 resource "google_dns_record_set" "private_googleapis_ipv4" {
-  name         = "private.gapis.com."
+  name         = "private.googleapis.com."
   managed_zone = google_dns_managed_zone.private_googleapis.name
   type         = "A"
   ttl          = 300

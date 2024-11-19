@@ -407,10 +407,13 @@ resource "google_compute_address" "web_ip" {
 
 
 locals {
-  console_image_name = var.use_custom_image ? var.automq_byoc_env_console_image : "automq-control-center-prod-${var.automq_byoc_env_version}-x86_64"
+  console_image_name = var.use_custom_image ? var.automq_byoc_env_console_image : "Automq-control-center-Prod-${var.automq_byoc_env_version}-x86_64"
 }
 data "google_compute_image" "console_image" {
-  name = local.console_image_name
+  name = lower(
+    replace(replace(local.console_image_name, 
+    "_", "-"), 
+    ".", "-"))
 }
 
 data "google_compute_network" "vpc" {

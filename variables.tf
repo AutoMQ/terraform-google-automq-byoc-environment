@@ -67,7 +67,7 @@ variable "automq_byoc_machine_type" {
 variable "automq_byoc_env_version" {
   description = "Set the version for the AutoMQ BYOC environment console. It is recommended to keep the default value, which is the latest version."
   type        = string
-  default     = "1.2.10"
+  default     = "1.4.0"
 }
 
 variable "use_custom_image" {

@@ -432,6 +432,7 @@ resource "google_dns_managed_zone" "private_dns_zone" {
 
 
 resource "google_dns_managed_zone" "private_googleapis" {
+  count = var.create_new_vpc ? 1 : 0
   name        = "private-gapis-${var.automq_byoc_env_id}"
   dns_name    = "googleapis.com."
   description = "Private zone for Google APIs"
@@ -445,6 +446,7 @@ resource "google_dns_managed_zone" "private_googleapis" {
 }
 
 resource "google_dns_record_set" "wildcard_googleapis_cname" {
+  count = var.create_new_vpc ? 1 : 0
   name         = "*.googleapis.com."
   managed_zone = google_dns_managed_zone.private_googleapis.name
   type         = "CNAME"
@@ -453,6 +455,7 @@ resource "google_dns_record_set" "wildcard_googleapis_cname" {
 }
 
 resource "google_dns_record_set" "private_googleapis_ipv4" {
+  count = var.create_new_vpc ? 1 : 0
   name         = "private.googleapis.com."
   managed_zone = google_dns_managed_zone.private_googleapis.name
   type         = "A"
@@ -461,6 +464,7 @@ resource "google_dns_record_set" "private_googleapis_ipv4" {
 }
 
 resource "google_compute_route" "route_ipv4_googleapi" {
+  count = var.create_new_vpc ? 1 : 0
   name             = "route-to-gapis-ipv4-${var.automq_byoc_env_id}"
   network          = data.google_compute_network.vpc.id
   dest_range       = "199.36.153.8/30"
@@ -470,6 +474,7 @@ resource "google_compute_route" "route_ipv4_googleapi" {
 }
 
 resource "google_compute_route" "route_ipv4_googleapi_additional" {
+  count = var.create_new_vpc ? 1 : 0
   name             = "route-to-gapis-ipv4-additional-${var.automq_byoc_env_id}"
   network          = data.google_compute_network.vpc.id
   dest_range       = "34.126.0.0/18"
@@ -479,6 +484,7 @@ resource "google_compute_route" "route_ipv4_googleapi_additional" {
 }
 
 resource "google_compute_firewall" "allow_googleapis_ipv4" {
+  count = var.create_new_vpc ? 1 : 0
   name    = "allow-out-gapis-ipv4-${var.automq_byoc_env_id}"
   network = data.google_compute_network.vpc.name
 

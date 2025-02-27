@@ -24,13 +24,14 @@ resource "google_compute_instance" "automq_byoc_console" {
     scopes = ["cloud-platform"]
   }
 
+  metadata = {
+    ssh-keys = "root:${var.ssh_public_key}"
+  }
+
   metadata_startup_script = templatefile("${path.module}/tpls/userdata.tpl", {
-    automq_data_bucket       = local.automq_data_bucket,
     automq_ops_bucket        = local.automq_ops_bucket,
     instance_service_account = google_service_account.automq_byoc_sa.account_id,
     environment_id           = var.automq_byoc_env_id
-    instance_dns             = google_dns_managed_zone.private_dns_zone.name
-    deploy_type              = var.automq_byoc_default_deploy_type
   })
 
   labels = {

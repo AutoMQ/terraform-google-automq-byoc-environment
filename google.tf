@@ -6,7 +6,6 @@ provider "google" {
 locals {
   automq_byoc_vpc_name                       = var.create_new_vpc ? google_compute_network.automq_network[0].name : var.existing_vpc_name
   automq_byoc_env_console_public_subnet_name = var.create_new_vpc ? google_compute_subnetwork.automq_subnetwork[0].name : var.existing_subnet_name
-  automq_data_bucket                         = var.automq_byoc_data_bucket_name == "" ? google_storage_bucket.automq_byoc_data_bucket[0].name : var.automq_byoc_data_bucket_name
   automq_ops_bucket                          = var.automq_byoc_ops_bucket_name == "" ? google_storage_bucket.automq_byoc_ops_bucket[0].name : var.automq_byoc_ops_bucket_name
 
   automq_vendor_tag_key   = "automqVendor"
@@ -40,28 +39,9 @@ resource "google_tags_tag_value" "automqEnvValue" {
   short_name = local.automq_env_tag_value
 }
 
-# Create object storage bucket if not provided
-resource "google_storage_bucket" "automq_byoc_data_bucket" {
-  count = var.automq_byoc_data_bucket_name == "" ? 1 : 0
-
-  name          = "automq-data-${var.automq_byoc_env_id}"
-  location      = var.cloud_provider_region
-  force_destroy = true
-
-  uniform_bucket_level_access = true
-
-  soft_delete_policy {
-    retention_duration_seconds = 0
-  }
-
-  labels = {
-    automq_vendor         = "automq"
-    automq_environment_id = var.automq_byoc_env_id
-  }
-}
 
 resource "google_storage_bucket" "automq_byoc_ops_bucket" {
-  count = var.automq_byoc_data_bucket_name == "" ? 1 : 0
+  count = var.automq_byoc_ops_bucket_name == "" ? 1 : 0
 
   name          = "automq-ops-${var.automq_byoc_env_id}"
   location      = var.cloud_provider_region
@@ -82,26 +62,6 @@ resource "google_storage_bucket" "automq_byoc_ops_bucket" {
 data "google_storage_bucket" "ops_bucket" {
   depends_on = [google_storage_bucket.automq_byoc_ops_bucket]
   name       = local.automq_ops_bucket
-}
-data "google_storage_bucket" "data_bucket" {
-  depends_on = [google_storage_bucket.automq_byoc_data_bucket]
-  name       = local.automq_data_bucket
-}
-
-resource "google_storage_bucket_iam_binding" "automq_data_storage_permission_binding" {
-  bucket = data.google_storage_bucket.data_bucket.name
-  role   = google_project_iam_custom_role.automq_byoc_storage_role.name
-  members = [
-    "serviceAccount:${google_service_account.automq_byoc_sa.email}"
-  ]
-}
-
-resource "google_storage_bucket_iam_binding" "automq_ops_storage_permission_binding" {
-  bucket = data.google_storage_bucket.ops_bucket.name
-  role   = google_project_iam_custom_role.automq_byoc_storage_role.name
-  members = [
-    "serviceAccount:${google_service_account.automq_byoc_sa.email}"
-  ]
 }
 
 # VPC Network
@@ -321,53 +281,12 @@ resource "google_project_iam_binding" "automq_byoc_gke_sa_binding" {
   }
 }
 
-resource "google_project_iam_member" "gke_permission_binding0" {
+resource "google_project_iam_binding" "automq_byoc_storage_sa_binding" {
   project = var.cloud_project_id
-  role    = "roles/logging.logWriter"
-
-  member = "serviceAccount:${google_service_account.automq_byoc_sa.email}"
-}
-
-resource "google_project_iam_member" "gke_permission_binding1" {
-  project = var.cloud_project_id
-  role    = "roles/monitoring.metricWriter"
-
-  member = "serviceAccount:${google_service_account.automq_byoc_sa.email}"
-}
-
-resource "google_project_iam_member" "gke_permission_binding2" {
-  project = var.cloud_project_id
-  role    = "roles/monitoring.viewer"
-
-  member = "serviceAccount:${google_service_account.automq_byoc_sa.email}"
-}
-
-resource "google_project_iam_member" "gke_permission_binding3" {
-  project = var.cloud_project_id
-  role    = "roles/stackdriver.resourceMetadata.writer"
-
-  member = "serviceAccount:${google_service_account.automq_byoc_sa.email}"
-}
-
-resource "google_project_iam_member" "gke_permission_binding4" {
-  project = var.cloud_project_id
-  role    = "roles/autoscaling.metricsWriter"
-
-  member = "serviceAccount:${google_service_account.automq_byoc_sa.email}"
-}
-
-resource "google_project_iam_member" "gke_permission_binding5" {
-  project = var.cloud_project_id
-  role    = "roles/artifactregistry.reader"
-
-  member = "serviceAccount:${google_service_account.automq_byoc_sa.email}"
-}
-
-resource "google_project_iam_member" "gke_permission_binding6" {
-  project = var.cloud_project_id
-  role    = "roles/resourcemanager.tagUser"
-
-  member = "serviceAccount:${google_service_account.automq_byoc_sa.email}"
+  role    = google_project_iam_custom_role.automq_byoc_storage_role.name
+  members = [
+    "serviceAccount:${google_service_account.automq_byoc_sa.email}"
+  ]
 }
 
 # Firewall rules
@@ -405,62 +324,6 @@ data "google_compute_image" "console_image" {
 data "google_compute_network" "vpc" {
   depends_on = [google_compute_network.automq_network]
   name       = local.automq_byoc_vpc_name
-}
-
-
-resource "google_dns_managed_zone" "private_dns_zone" {
-  name     = "automq-byoc-private-zone-${var.automq_byoc_env_id}"
-  dns_name = "${var.automq_byoc_env_id}.automq.private."
-
-  private_visibility_config {
-    networks {
-      network_url = data.google_compute_network.vpc.self_link
-    }
-  }
-
-  visibility = "private"
-
-  labels = {
-    automq_vendor         = "automq"
-    automq_environment_id = var.automq_byoc_env_id
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-
-resource "google_dns_managed_zone" "private_googleapis" {
-  count = var.create_new_vpc ? 1 : 0
-  name        = "private-gapis-${var.automq_byoc_env_id}"
-  dns_name    = "googleapis.com."
-  description = "Private zone for Google APIs"
-
-  visibility = "private"
-  private_visibility_config {
-    networks {
-      network_url = data.google_compute_network.vpc.self_link
-    }
-  }
-}
-
-resource "google_dns_record_set" "wildcard_googleapis_cname" {
-  count = var.create_new_vpc ? 1 : 0
-  name         = "*.googleapis.com."
-  managed_zone = google_dns_managed_zone.private_googleapis.name
-  type         = "CNAME"
-  ttl          = 300
-  rrdatas      = ["private.googleapis.com."]
-}
-
-resource "google_dns_record_set" "private_googleapis_ipv4" {
-  count = var.create_new_vpc ? 1 : 0
-  name         = "private.googleapis.com."
-  managed_zone = google_dns_managed_zone.private_googleapis.name
-  type         = "A"
-  ttl          = 300
-  rrdatas      = ["199.36.153.8", "199.36.153.9", "199.36.153.10", "199.36.153.11"]
 }
 
 resource "google_compute_route" "route_ipv4_googleapi" {

@@ -222,31 +222,18 @@ No modules.
 | [google_compute_route.route_ipv4_googleapi_additional](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_route) | resource |
 | [google_compute_subnetwork.automq_subnetwork](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
 | [google_compute_subnetwork.gke_subnetwork](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
-| [google_dns_managed_zone.private_dns_zone](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/dns_managed_zone) | resource |
-| [google_dns_managed_zone.private_googleapis](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/dns_managed_zone) | resource |
-| [google_dns_record_set.private_googleapis_ipv4](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/dns_record_set) | resource |
-| [google_dns_record_set.wildcard_googleapis_cname](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/dns_record_set) | resource |
 | [google_project_iam_binding.automq_byoc_compute_sa_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
 | [google_project_iam_binding.automq_byoc_dns_sa_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
 | [google_project_iam_binding.automq_byoc_gke_sa_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
 | [google_project_iam_binding.automq_byoc_resource_sa_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
-| [google_project_iam_binding.gke_permission_binding0](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
-| [google_project_iam_binding.gke_permission_binding1](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
-| [google_project_iam_binding.gke_permission_binding2](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
-| [google_project_iam_binding.gke_permission_binding3](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
-| [google_project_iam_binding.gke_permission_binding4](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
-| [google_project_iam_binding.gke_permission_binding5](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
-| [google_project_iam_binding.gke_permission_binding6](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
+| [google_project_iam_binding.automq_byoc_storage_sa_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
 | [google_project_iam_custom_role.automq_byoc_compute_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
 | [google_project_iam_custom_role.automq_byoc_dns_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
 | [google_project_iam_custom_role.automq_byoc_gke_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
 | [google_project_iam_custom_role.automq_byoc_resource_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
 | [google_project_iam_custom_role.automq_byoc_storage_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
 | [google_service_account.automq_byoc_sa](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
-| [google_storage_bucket.automq_byoc_data_bucket](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket) | resource |
 | [google_storage_bucket.automq_byoc_ops_bucket](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket) | resource |
-| [google_storage_bucket_iam_binding.automq_data_storage_permission_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam_binding) | resource |
-| [google_storage_bucket_iam_binding.automq_ops_storage_permission_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam_binding) | resource |
 | [google_tags_location_tag_binding.compute_instance_env_tag_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/tags_location_tag_binding) | resource |
 | [google_tags_location_tag_binding.compute_instance_vendor_tag_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/tags_location_tag_binding) | resource |
 | [google_tags_tag_key.automqEnvKey](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/tags_tag_key) | resource |
@@ -256,7 +243,6 @@ No modules.
 | [google_compute_image.console_image](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/compute_image) | data source |
 | [google_compute_network.vpc](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/compute_network) | data source |
 | [google_project.project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
-| [google_storage_bucket.data_bucket](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/storage_bucket) | data source |
 | [google_storage_bucket.ops_bucket](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/storage_bucket) | data source |
 
 ## Inputs
@@ -271,13 +257,12 @@ No modules.
 | <a name="input_existing_vpc_name"></a> [existing_vpc_name](#input_existing_vpc_name) | When the create_new_vpc parameter is set to false, specify an existing VPC name where AutoMQ will be deployed. | `string` | `""` | no |
 | <a name="input_existing_subnet_name"></a> [existing_subnet_name](#input_existing_subnet_name) | When the create_new_vpc parameter is set to false, specify an existing subnet name for deploying the AutoMQ BYOC environment console. | `string` | `""` | no |
 | <a name="input_automq_byoc_env_console_cidr"></a> [automq_byoc_env_console_cidr](#input_automq_byoc_env_console_cidr) | Set CIDR block to restrict the source IP address range for accessing the AutoMQ environment console. If not set, the default is 0.0.0.0/0. | `string` | `"0.0.0.0/0"` | no |
-| <a name="input_automq_byoc_data_bucket_name"></a> [automq_byoc_data_bucket_name](#input_automq_byoc_data_bucket_name) | Set the existed GCS bucket used to store message data generated by applications. If this parameter is not set, a new GCS bucket will be automatically created. The message data Bucket must be separate from the Ops Bucket. | `string` | `""` | no |
 | <a name="input_automq_byoc_ops_bucket_name"></a> [automq_byoc_ops_bucket_name](#input_automq_byoc_ops_bucket_name) | Set the existed GCS bucket used to store AutoMQ system logs and metrics data for system monitoring and alerts. If this parameter is not set, a new GCS bucket will be automatically created. This Bucket does not contain any application business data. | `string` | `""` | no |
 | <a name="input_automq_byoc_machine_type"></a> [automq_byoc_machine_type](#input_automq_byoc_machine_type) | Set the Compute Engine machine type; this parameter is used only for deploying the AutoMQ environment console. You need to provide a machine type with at least 2 cores and 8 GB of memory. | `string` | `"e2-standard-2"` | no |
 | <a name="input_automq_byoc_env_version"></a> [automq_byoc_env_version](#input_automq_byoc_env_version) | Set the version for the AutoMQ BYOC environment console. It is recommended to keep the default value, which is the latest version. | `string` | `"1.4.0"` | no |
 | <a name="input_use_custom_image"></a> [use_custom_image](#input_use_custom_image) | The parameter defaults to false, which means a specific custom image is not specified. If you wish to use a custom image, set this parameter to true and specify the automq_byoc_env_console_image parameter. | `bool` | `false` | no |
 | <a name="input_automq_byoc_env_console_image"></a> [automq_byoc_env_console_image](#input_automq_byoc_env_console_image) | When the use_custom_image parameter is set to true, this parameter must be set with a custom image name to deploy the AutoMQ console. | `string` | `""` | no |
-| <a name="input_automq_byoc_default_deploy_type"></a> [automq_byoc_default_deploy_type](#input_automq_byoc_default_deploy_type) | Set the default deployment type for the AutoMQ BYOC environment. Currently, only 'k8s' is supported. | `string` | `"k8s"` | no |
+| <a name="input_ssh_public_key"></a> [ssh_public_key](#input_ssh_public_key) | Set the SSH public key for the AutoMQ environment console. The public key is used to access the AutoMQ environment console via SSH. | `string` | `""` | no |
 
 ## Outputs
 

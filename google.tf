@@ -39,7 +39,7 @@ resource "google_tags_tag_value" "automqVendorValue" {
 
 resource "google_tags_tag_key" "automqEnvKey" {
   parent     = "projects/${var.cloud_project_id}"
-  short_name = "${local.automq_env_tag_key}-${var.automq_byoc_env_id}"
+  short_name = "${local.automq_env_tag_key}-${random_id.deployment_id.hex}"
 }
 
 resource "google_tags_tag_value" "automqEnvValue" {

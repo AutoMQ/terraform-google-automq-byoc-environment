@@ -19,9 +19,17 @@ data "google_project" "project" {
   project_id = var.cloud_project_id
 }
 
+resource "random_id" "deployment_id" {
+  keepers = {
+    # Generate a new id each time we switch to a new deployment name
+    deployment_name = var.automq_byoc_env_id
+  }
+  byte_length = 8
+}
+
 resource "google_tags_tag_key" "automqVendorKey" {
   parent     = "projects/${var.cloud_project_id}"
-  short_name = "${local.automq_vendor_tag_key}-${var.automq_byoc_env_id}"
+  short_name = "${local.automq_vendor_tag_key}-${random_id.deployment_id.hex}"
 }
 
 resource "google_tags_tag_value" "automqVendorValue" {

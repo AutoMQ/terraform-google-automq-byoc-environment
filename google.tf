@@ -373,7 +373,7 @@ resource "google_compute_firewall" "subnet_allow-internal" {
     protocol = "icmp"
   }
 
-  destination_ranges = [
+  source_ranges = [
     "10.128.0.0/9"
   ]
 

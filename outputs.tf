@@ -32,3 +32,8 @@ output "automq_byoc_google_service_account" {
   description = "The Google Service Account for the AutoMQ environment deployment."
   value       = google_service_account.automq_byoc_sa.email
 }
+
+output "automq_byoc_console_subnet" {
+  description = "The subnet for the AutoMQ environment console."
+  value       = local.automq_byoc_env_console_public_subnet_name
+}

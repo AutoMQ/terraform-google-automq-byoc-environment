@@ -354,6 +354,32 @@ resource "google_compute_route" "route_ipv4_googleapi_additional" {
   priority = 90
 }
 
+resource "google_compute_firewall" "subnet_allow-internal" {
+  count   = var.create_new_vpc ? 1 : 0
+  name    = "default-allow-internal"
+  network = data.google_compute_network.vpc.name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["0-65534"]
+  }
+
+  allow {
+    protocol = "udp"
+    ports    = ["0-65534"]
+  }
+
+  allow {
+    protocol = "icmp"
+  }
+
+  destination_ranges = [
+    "10.128.0.0/9"
+  ]
+
+  direction = "INGRESS"
+}
+
 resource "google_compute_firewall" "allow_googleapis_ipv4" {
   count = var.create_new_vpc ? 1 : 0
   name    = "allow-out-gapis-ipv4-${var.automq_byoc_env_id}"

@@ -356,7 +356,7 @@ resource "google_compute_route" "route_ipv4_googleapi_additional" {
 
 resource "google_compute_firewall" "subnet_allow-internal" {
   count   = var.create_new_vpc ? 1 : 0
-  name    = "default-allow-internal"
+  name    = "allow-internal-firewall-${var.automq_byoc_env_id}"
   network = data.google_compute_network.vpc.name
 
   allow {

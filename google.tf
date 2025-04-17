@@ -250,6 +250,17 @@ resource "google_project_iam_custom_role" "automq_byoc_gke_role" {
     "container.storageClasses.get",
     "container.storageClasses.list",
     "container.storageClasses.update",
+    "container.deployments.get",
+    "container.deployments.create",
+    "container.deployments.delete", 
+    "container.deployments.list",
+    "container.deployments.getScale",
+    "container.deployments.getStatus",
+    "container.priorityClasses.create",
+    "container.priorityClasses.delete",
+    "container.priorityClasses.get",
+    "container.priorityClasses.list",
+    "container.priorityClasses.update"
   ]
 }
 

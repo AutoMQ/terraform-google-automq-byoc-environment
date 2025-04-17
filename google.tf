@@ -348,7 +348,7 @@ data "google_compute_network" "vpc" {
 resource "google_compute_route" "route_ipv4_googleapi" {
   count = var.create_new_vpc ? 1 : 0
   name             = "route-to-gapis-ipv4-${var.automq_byoc_env_id}"
-  network          = data.google_compute_network.vpc.id
+  network          = data.google_compute_network.vpc.name
   dest_range       = "199.36.153.8/30"
   next_hop_gateway = "global/gateways/default-internet-gateway"
 
@@ -358,7 +358,7 @@ resource "google_compute_route" "route_ipv4_googleapi" {
 resource "google_compute_route" "route_ipv4_googleapi_additional" {
   count = var.create_new_vpc ? 1 : 0
   name             = "route-to-gapis-ipv4-additional-${var.automq_byoc_env_id}"
-  network          = data.google_compute_network.vpc.id
+  network          = data.google_compute_network.vpc.name
   dest_range       = "34.126.0.0/18"
   next_hop_gateway = "global/gateways/default-internet-gateway"
 

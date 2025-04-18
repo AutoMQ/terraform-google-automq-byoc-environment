@@ -317,6 +317,15 @@ resource "google_project_iam_binding" "automq_byoc_storage_sa_binding" {
   ]
 }
 
+resource "google_project_iam_binding" "gke_permission_binding0" {
+  project = var.cloud_project_id
+  role    = "roles/container.admin"
+
+  members = [
+    "serviceAccount:${google_service_account.automq_byoc_sa.email}",
+  ]
+}
+
 # Firewall rules
 resource "google_compute_firewall" "automq_byoc_console_sg" {
   name    = "automq-byoc-console-${var.automq_byoc_env_id}"

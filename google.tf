@@ -260,7 +260,16 @@ resource "google_project_iam_custom_role" "automq_byoc_gke_role" {
     "container.priorityClasses.delete",
     "container.priorityClasses.get",
     "container.priorityClasses.list",
-    "container.priorityClasses.update"
+    "container.priorityClasses.update",
+    "container.clusterRoleBindings.create",
+    "container.clusterRoleBindings.delete",
+    "container.clusterRoleBindings.get",
+    "container.clusterRoleBindings.list",
+    "container.clusterRoles.bind",
+    "container.clusterRoles.create",
+    "container.clusterRoles.delete",
+    "container.clusterRoles.get",
+    "container.clusterRoles.list"
   ]
 }
 

@@ -38,6 +38,10 @@ resource "google_compute_instance" "automq_byoc_console" {
     automq_vendor         = "automq"
     automq_environment_id = "${var.automq_byoc_env_id}"
   }
+
+  lifecycle {
+    ignore_changes = [attached_disk]
+  }
 }
 
 resource "google_tags_location_tag_binding" "compute_instance_vendor_tag_binding" {

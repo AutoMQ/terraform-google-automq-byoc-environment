@@ -13,6 +13,8 @@ locals {
 
   automq_env_tag_key   = "automqEnvironmentId"
   automq_env_tag_value = var.automq_byoc_env_id
+
+  console_image_self_link = var.use_custom_image ? var.automq_byoc_env_console_image : "projects/automq-public/global/images/automq-control-center-prod-7-7-4-x86-64"
 }
 
 data "google_project" "project" {
@@ -252,7 +254,7 @@ resource "google_project_iam_custom_role" "automq_byoc_gke_role" {
     "container.storageClasses.update",
     "container.deployments.get",
     "container.deployments.create",
-    "container.deployments.delete", 
+    "container.deployments.delete",
     "container.deployments.list",
     "container.deployments.getScale",
     "container.deployments.getStatus",
@@ -303,10 +305,6 @@ resource "google_project_iam_binding" "automq_byoc_gke_sa_binding" {
   members = [
     "serviceAccount:${google_service_account.automq_byoc_sa.email}"
   ]
-  condition {
-    title      = "AutoMQ BYOC ${var.automq_byoc_env_id} GKE Role Condition"
-    expression = "resource.matchTag(\"${var.cloud_project_id}/automqAssigned\", \"automq\")"
-  }
 }
 
 resource "google_project_iam_binding" "automq_byoc_storage_sa_binding" {
@@ -348,23 +346,13 @@ resource "google_compute_address" "web_ip" {
 }
 
 
-locals {
-  console_image_name = var.use_custom_image ? var.automq_byoc_env_console_image : "Automq-control-center-Prod-${var.automq_byoc_env_version}-x86_64"
-}
-data "google_compute_image" "console_image" {
-  name = lower(
-    replace(replace(local.console_image_name,
-      "_", "-"),
-  ".", "-"))
-}
-
 data "google_compute_network" "vpc" {
   depends_on = [google_compute_network.automq_network]
   name       = local.automq_byoc_vpc_name
 }
 
 resource "google_compute_route" "route_ipv4_googleapi" {
-  count = var.create_new_vpc ? 1 : 0
+  count            = var.create_new_vpc ? 1 : 0
   name             = "route-to-gapis-ipv4-${var.automq_byoc_env_id}"
   network          = data.google_compute_network.vpc.name
   dest_range       = "199.36.153.8/30"
@@ -374,7 +362,7 @@ resource "google_compute_route" "route_ipv4_googleapi" {
 }
 
 resource "google_compute_route" "route_ipv4_googleapi_additional" {
-  count = var.create_new_vpc ? 1 : 0
+  count            = var.create_new_vpc ? 1 : 0
   name             = "route-to-gapis-ipv4-additional-${var.automq_byoc_env_id}"
   network          = data.google_compute_network.vpc.name
   dest_range       = "34.126.0.0/18"
@@ -410,7 +398,7 @@ resource "google_compute_firewall" "subnet_allow-internal" {
 }
 
 resource "google_compute_firewall" "allow_googleapis_ipv4" {
-  count = var.create_new_vpc ? 1 : 0
+  count   = var.create_new_vpc ? 1 : 0
   name    = "allow-out-gapis-ipv4-${var.automq_byoc_env_id}"
   network = data.google_compute_network.vpc.name
 
@@ -426,4 +414,3 @@ resource "google_compute_firewall" "allow_googleapis_ipv4" {
 
   direction = "EGRESS"
 }
-

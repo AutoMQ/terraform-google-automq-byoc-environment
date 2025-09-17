@@ -5,7 +5,7 @@ resource "google_compute_instance" "automq_byoc_console" {
 
   boot_disk {
     initialize_params {
-      image = data.google_compute_image.console_image.self_link
+      image = local.console_image_self_link
       size  = 20
       type  = "pd-balanced"
     }

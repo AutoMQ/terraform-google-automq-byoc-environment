@@ -58,20 +58,14 @@ variable "automq_byoc_machine_type" {
   default     = "e2-standard-2" # GCP equivalent of t3.large
 }
 
-variable "automq_byoc_env_version" {
-  description = "Set the version for the AutoMQ BYOC environment console. It is recommended to keep the default value, which is the latest version."
-  type        = string
-  default     = "1.4.0"
-}
-
 variable "use_custom_image" {
-  description = "The parameter defaults to false, which means a specific custom image is not specified. If you wish to use a custom image, set this parameter to true and specify the automq_byoc_env_console_image parameter."
+  description = "Set to true to use a custom image for the AutoMQ environment console and provide the image self link via automq_byoc_env_console_image."
   type        = bool
   default     = false
 }
 
 variable "automq_byoc_env_console_image" {
-  description = "When the use_custom_image parameter is set to true, this parameter must be set with a custom image name to deploy the AutoMQ console."
+  description = "The custom image self link used when use_custom_image is true."
   type        = string
   default     = ""
 }

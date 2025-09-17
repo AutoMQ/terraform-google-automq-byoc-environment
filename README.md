@@ -244,10 +244,11 @@ No modules.
 | [google_tags_tag_key.automqVendorKey](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/tags_tag_key) | resource |
 | [google_tags_tag_value.automqEnvValue](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/tags_tag_value) | resource |
 | [google_tags_tag_value.automqVendorValue](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/tags_tag_value) | resource |
-| [random_id.deployment_id](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [google_compute_network.vpc](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/compute_network) | data source |
 | [google_project.project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
 | [google_storage_bucket.ops_bucket](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/storage_bucket) | data source |
+
+The module defaults to the AutoMQ BYOC console image `projects/automq-public/global/images/automq-control-center-prod-7-7-4-x86-64`. To use a different image, set `use_custom_image = true` and provide the full self link via `automq_byoc_env_console_image`.
 
 ## Inputs
 
@@ -263,7 +264,7 @@ No modules.
 | <a name="input_automq_byoc_env_console_cidr"></a> [automq_byoc_env_console_cidr](#input_automq_byoc_env_console_cidr) | Set CIDR block to restrict the source IP address range for accessing the AutoMQ environment console. If not set, the default is 0.0.0.0/0. | `string` | `"0.0.0.0/0"` | no |
 | <a name="input_automq_byoc_ops_bucket_name"></a> [automq_byoc_ops_bucket_name](#input_automq_byoc_ops_bucket_name) | Set the existed GCS bucket used to store AutoMQ system logs and metrics data for system monitoring and alerts. If this parameter is not set, a new GCS bucket will be automatically created. This Bucket does not contain any application business data. | `string` | `""` | no |
 | <a name="input_automq_byoc_machine_type"></a> [automq_byoc_machine_type](#input_automq_byoc_machine_type) | Set the Compute Engine machine type; this parameter is used only for deploying the AutoMQ environment console. You need to provide a machine type with at least 2 cores and 8 GB of memory. | `string` | `"e2-standard-2"` | no |
-| <a name="input_use_custom_image"></a> [use_custom_image](#input_use_custom_image) | Set to true to use a custom image for the AutoMQ environment console and provide the image self link via automq_byoc_env_console_image. | `bool` | `false` | no |
+| <a name="input_use_custom_image"></a> [use_custom_image](#input_use_custom_image) | Set to true to use a custom image for the AutoMQ environment console and provide automq_byoc_env_console_image. | `bool` | `false` | no |
 | <a name="input_automq_byoc_env_console_image"></a> [automq_byoc_env_console_image](#input_automq_byoc_env_console_image) | The custom image self link used when use_custom_image is true. | `string` | `""` | no |
 | <a name="input_ssh_public_key"></a> [ssh_public_key](#input_ssh_public_key) | Set the SSH public key for the AutoMQ environment console. The public key is used to access the AutoMQ environment console via SSH. | `string` | `""` | no |
 
@@ -278,5 +279,4 @@ No modules.
 | <a name="output_automq_byoc_vpc_id"></a> [automq_byoc_vpc_id](#output_automq_byoc_vpc_id) | The VPC ID for the AutoMQ environment deployment. |
 | <a name="output_automq_byoc_instance_id"></a> [automq_byoc_instance_id](#output_automq_byoc_instance_id) | The EC2 instance id for AutoMQ Console. |
 | <a name="output_automq_byoc_google_service_account"></a> [automq_byoc_google_service_account](#output_automq_byoc_google_service_account) | The Google Service Account for the AutoMQ environment deployment. |
-| <a name="output_automq_byoc_console_subnet"></a> [automq_byoc_console_subnet](#output_automq_byoc_console_subnet) | The subnet for the AutoMQ environment console. |
 <!-- END_TF_DOCS -->

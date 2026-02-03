@@ -3,6 +3,12 @@ variable "cloud_project_id" {
   type        = string
 }
 
+variable "network_project_id" {
+  description = "If using Shared VPC, set the host project ID where the VPC network resides."
+  type        = string
+  default     = ""
+}
+
 variable "automq_byoc_env_id" {
   description = "The unique identifier of the AutoMQ environment. This parameter is used to create resources within the environment. Additionally, all cloud resource names will incorporate this parameter as part of their names. This parameter supports only numbers, uppercase and lowercase English letters, and hyphens. It must start with a letter and is limited to a length of 32 characters."
   type        = string
@@ -26,12 +32,6 @@ variable "create_new_vpc" {
   description = "This setting determines whether to create a new VPC. If set to true, a new VPC will be automatically created, which is recommended only for POC scenarios. For production scenarios using AutoMQ, you should provide the VPC where the current Kafka application resides."
   type        = bool
   default     = true
-}
-
-variable "existing_vpc_name" {
-  description = "When the create_new_vpc parameter is set to false, specify an existing VPC name where AutoMQ will be deployed."
-  type        = string
-  default     = ""
 }
 
 variable "existing_subnet_name" {

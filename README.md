@@ -97,7 +97,7 @@ module "automq-byoc" {
 
   create_new_vpc                           = false   
   existing_vpc_name                        = "xxxxx-network"
-  existing_subnet_name                     = "xxxxx-subnetwork"
+  existing_subnet_self_link                     = "xxxxx-subnetwork"
 
   automq_byoc_data_bucket_name             = "bucker-data-xxxx"
   automq_byoc_ops_bucket_name              = "bucker-ops-xxxx"
@@ -260,7 +260,7 @@ The module defaults to the AutoMQ BYOC console image `projects/automq-public/glo
 | <a name="input_cloud_provider_zone"></a> [cloud_provider_zone](#input_cloud_provider_zone) | Set the Google Cloud zone. AutoMQ will deploy to this zone. | `string` | n/a | yes |
 | <a name="input_create_new_vpc"></a> [create_new_vpc](#input_create_new_vpc) | This setting determines whether to create a new VPC. If set to true, a new VPC will be automatically created, which is recommended only for POC scenarios. For production scenarios using AutoMQ, you should provide the VPC where the current Kafka application resides. | `bool` | `true` | no |
 | <a name="input_existing_vpc_name"></a> [existing_vpc_name](#input_existing_vpc_name) | When the create_new_vpc parameter is set to false, specify an existing VPC name where AutoMQ will be deployed. | `string` | `""` | no |
-| <a name="input_existing_subnet_name"></a> [existing_subnet_name](#input_existing_subnet_name) | When the create_new_vpc parameter is set to false, specify an existing subnet name for deploying the AutoMQ BYOC environment console. | `string` | `""` | no |
+| <a name="input_existing_subnet_self_link"></a> [existing_subnet_self_link](#input_existing_subnet_self_link) | When the create_new_vpc parameter is set to false, specify an existing subnet name for deploying the AutoMQ BYOC environment console. | `string` | `""` | no |
 | <a name="input_automq_byoc_env_console_cidr"></a> [automq_byoc_env_console_cidr](#input_automq_byoc_env_console_cidr) | Set CIDR block to restrict the source IP address range for accessing the AutoMQ environment console. If not set, the default is 0.0.0.0/0. | `string` | `"0.0.0.0/0"` | no |
 | <a name="input_automq_byoc_ops_bucket_name"></a> [automq_byoc_ops_bucket_name](#input_automq_byoc_ops_bucket_name) | Set the existed GCS bucket used to store AutoMQ system logs and metrics data for system monitoring and alerts. If this parameter is not set, a new GCS bucket will be automatically created. This Bucket does not contain any application business data. | `string` | `""` | no |
 | <a name="input_automq_byoc_machine_type"></a> [automq_byoc_machine_type](#input_automq_byoc_machine_type) | Set the Compute Engine machine type; this parameter is used only for deploying the AutoMQ environment console. You need to provide a machine type with at least 2 cores and 8 GB of memory. | `string` | `"e2-standard-2"` | no |

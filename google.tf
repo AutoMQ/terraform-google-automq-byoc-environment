@@ -5,7 +5,7 @@ provider "google" {
 
 locals {
   automq_byoc_vpc_name                       = var.create_new_vpc ? google_compute_network.automq_network[0].name : var.existing_vpc_name
-  automq_byoc_env_console_public_subnet_name = var.create_new_vpc ? google_compute_subnetwork.automq_subnetwork[0].name : var.existing_subnet_name
+  automq_byoc_env_console_public_subnet_self_link = var.create_new_vpc ? google_compute_subnetwork.automq_subnetwork[0].self_link : var.existing_subnet_name
   automq_ops_bucket                          = var.automq_byoc_ops_bucket_name == "" ? google_storage_bucket.automq_byoc_ops_bucket[0].name : var.automq_byoc_ops_bucket_name
 
   automq_vendor_tag_key   = "automqVendor"
@@ -328,7 +328,7 @@ resource "google_project_iam_binding" "gke_permission_binding0" {
 resource "google_compute_firewall" "automq_byoc_console_sg" {
   name    = "automq-byoc-console-${var.automq_byoc_env_id}"
   network = local.automq_byoc_vpc_name
-  project = var.cloud_project_id
+  project = var.network_project_id != "" ? var.network_project_id : var.cloud_project_id
 
   allow {
     protocol = "tcp"
@@ -349,6 +349,12 @@ resource "google_compute_address" "web_ip" {
 data "google_compute_network" "vpc" {
   depends_on = [google_compute_network.automq_network]
   name       = local.automq_byoc_vpc_name
+}
+
+data "google_compute_subnetwork" "console_subnet" {
+  depends_on = [google_compute_subnetwork.automq_subnetwork]
+  name       = local.automq_byoc_env_console_public_subnet_self_link
+  region     = var.cloud_provider_region
 }
 
 resource "google_compute_route" "route_ipv4_googleapi" {

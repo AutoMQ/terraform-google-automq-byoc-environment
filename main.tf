@@ -12,8 +12,7 @@ resource "google_compute_instance" "automq_byoc_console" {
   }
 
   network_interface {
-    network    = local.automq_byoc_vpc_name
-    subnetwork = local.automq_byoc_env_console_public_subnet_name
+    subnetwork = local.automq_byoc_env_console_public_subnet_self_link
     access_config {
       nat_ip = google_compute_address.web_ip.address
     }

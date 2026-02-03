@@ -35,5 +35,5 @@ output "automq_byoc_google_service_account" {
 
 output "automq_byoc_console_subnet" {
   description = "The subnet for the AutoMQ environment console."
-  value       = local.automq_byoc_env_console_public_subnet_name
+  value       = local.automq_byoc_env_console_public_subnet_self_link
 }
